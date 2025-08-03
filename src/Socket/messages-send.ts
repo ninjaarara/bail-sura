@@ -8,6 +8,7 @@ import { DEFAULT_CACHE_TTLS, WA_DEFAULT_EPHEMERAL } from '../Defaults'
 import {
 	AnyMessageContent,
 	AlbumMedia,
+	CacheStore,
 	MediaConnInfo,
 	MessageReceiptType,
 	MessageRelayOptions,
@@ -80,10 +81,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		groupToggleEphemeral,
 	} = sock
 
-	const userDevicesCache = config.userDevicesCache || new NodeCache({
+	const userDevicesCache: CacheStore = (config.userDevicesCache || new NodeCache({
 		stdTTL: DEFAULT_CACHE_TTLS.USER_DEVICES, // 5 minutes
 		useClones: false
-	})
+	})) as any
 
 	let mediaConn: Promise<MediaConnInfo>
 	const refreshMediaConn = async(forceGet = false) => {
@@ -330,7 +331,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 		let shouldIncludeDeviceIdentity = false
 		const nodes = await Promise.all(
-			patched.map(
+			(patched as any).map(
 				async patchedMessageWithJid => {
 					const { recipientJid: jid, ...patchedMessage } = patchedMessageWithJid
 					if(!jid) {

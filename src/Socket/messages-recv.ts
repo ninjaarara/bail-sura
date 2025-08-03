@@ -6,6 +6,7 @@ import NodeCache from '@cacheable/node-cache'
 import { proto } from '../../WAProto'
 import { DEFAULT_CACHE_TTLS, KEY_BUNDLE_TYPE, MIN_PREKEY_COUNT } from '../Defaults'
 import {
+	CacheStore,
 	MessageReceiptType,
 	MessageRelayOptions,
 	MessageUserReceipt,
@@ -94,19 +95,20 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 	/** this mutex ensures that each retryRequest will wait for the previous one to finish */
 	const retryMutex = makeMutex()
 
-	const msgRetryCache = config.msgRetryCounterCache || new NodeCache({
+	const msgRetryCache: CacheStore = (config.msgRetryCounterCache || new NodeCache({
 		stdTTL: DEFAULT_CACHE_TTLS.MSG_RETRY, // 1 hour
 		useClones: false
-	})
-	const callOfferCache = config.callOfferCache || new NodeCache({
+	})) as any
+
+	const callOfferCache: CacheStore = (config.callOfferCache || new NodeCache({
 		stdTTL: DEFAULT_CACHE_TTLS.CALL_OFFER, // 5 mins
 		useClones: false
-	})
+	})) as any
 
-	const placeholderResendCache = config.placeholderResendCache || new NodeCache({
+	const placeholderResendCache: CacheStore = (config.placeholderResendCache || new NodeCache({
 		stdTTL: DEFAULT_CACHE_TTLS.MSG_RETRY, // 1 hour
 		useClones: false
-	})
+	})) as any
 
 	let sendActiveReceipts = false
 
